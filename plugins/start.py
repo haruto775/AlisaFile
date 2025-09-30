@@ -94,7 +94,7 @@ async def start_command(client: Client, message: Message):
             return
         finally:
             await temp_msg.delete()
- 
+
         codeflix_msgs = []
         for msg in messages:
             caption = (CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, 
@@ -129,7 +129,7 @@ async def start_command(client: Client, message: Message):
     else:
         reply_markup = InlineKeyboardMarkup(
             [
-                    [InlineKeyboardButton("• ᴍᴏʀᴇ ᴄʜᴀɴɴᴇʟs •", url="https://t.me/Nova_Flix/50")],
+                    [InlineKeyboardButton("• ᴍᴏʀᴇ ᴄʜᴀɴɴᴇʟs •", url="https://t.me/mythic_animes/")],
 
     [
                     InlineKeyboardButton("• ᴀʙᴏᴜᴛ", callback_data = "about"),
@@ -138,6 +138,8 @@ async def start_command(client: Client, message: Message):
     ]
             ]
         )
+        await message.reply_chat_action(ChatAction.TYPING)
+
         await message.reply_photo(
             photo=START_PIC,
             caption=START_MSG.format(
@@ -149,7 +151,7 @@ async def start_command(client: Client, message: Message):
             ),
             reply_markup=reply_markup,
             message_effect_id=5104841245755180586)  # 🔥
-        
+
         return
 
 
