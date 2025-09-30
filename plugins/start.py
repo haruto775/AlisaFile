@@ -49,11 +49,12 @@ async def start_command(client: Client, message: Message):
                 [[InlineKeyboardButton("Contact Support", url=BAN_SUPPORT)]]
             )
         )
+
     # ✅ Check Force Subscription
     if not await is_subscribed(client, user_id):
         return await not_joined(client, message)
 
-    # File auto-delete time in seconds (Set your desired time in seconds here)
+    # File auto-delete time in seconds
     FILE_AUTO_DELETE = await db.get_del_timer()  # Example: 3600 seconds (1 hour)
 
     # Handle normal message flow
@@ -84,10 +85,15 @@ async def start_command(client: Client, message: Message):
                 print(f"Error decoding ID: {e}")
                 return
 
+        # Send "Please wait..." message
         temp_msg = await message.reply("<b>Please wait...</b>")
+        # Show "choose sticker" chat action and wait for visibility
+        await message.reply_chat_action(ChatAction.CHOOSE_STICKER)
+        await asyncio.sleep(1)  # Delay to make chat action visible
         try:
             messages = await get_messages(client, ids)
         except Exception as e:
+            await temp_msg.delete()
             await message.reply_text("Something went wrong!")
             print(f"Error getting messages: {e}")
             return
@@ -95,8 +101,6 @@ async def start_command(client: Client, message: Message):
             await temp_msg.delete()
 
         codeflix_msgs = []
-        # Show "choose sticker" chat action before sending files
-        await message.reply_chat_action(ChatAction.CHOOSE_STICKER)
         for msg in messages:
             caption = (CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, 
                                              filename=msg.document.file_name) if bool(CUSTOM_CAPTION) and bool(msg.document)
@@ -128,6 +132,11 @@ async def start_command(client: Client, message: Message):
                 schedule_auto_delete(client, codeflix_msgs, notification_msg, FILE_AUTO_DELETE, reload_url)
             )
     else:
+        # Send "Please wait..." message
+        temp_msg = await message.reply("<b>Please wait...</b>")
+        # Show "typing" chat action and wait for visibility
+        await message.reply_chat_action(ChatAction.TYPING)
+        await asyncio.sleep(2)  # Delay to make chat action visible
         reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("• ᴍᴏʀᴇ ᴄʜᴀɴɴᴇʟs •", url="https://t.me/mythic_animes/")],
@@ -137,8 +146,6 @@ async def start_command(client: Client, message: Message):
                 ]
             ]
         )
-        # Show "typing" chat action before sending start message
-        await message.reply_chat_action(ChatAction.TYPING)
         await message.reply_photo(
             photo=START_PIC,
             caption=START_MSG.format(
@@ -150,7 +157,8 @@ async def start_command(client: Client, message: Message):
             ),
             reply_markup=reply_markup,
             message_effect_id=5104841245755180586
-        )  # 🔥
+        ) # 🔥
+        await temp_msg.delete()  # Delete "Please wait..." message
         return
 
 
