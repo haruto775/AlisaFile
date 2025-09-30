@@ -51,7 +51,6 @@ async def start_command(client: Client, message: Message):
         )
     # ✅ Check Force Subscription
     if not await is_subscribed(client, user_id):
-        #await temp.delete()
         return await not_joined(client, message)
 
     # File auto-delete time in seconds (Set your desired time in seconds here)
@@ -96,6 +95,8 @@ async def start_command(client: Client, message: Message):
             await temp_msg.delete()
 
         codeflix_msgs = []
+        # Show "choose sticker" chat action before sending files
+        await message.reply_chat_action(ChatAction.CHOOSE_STICKER)
         for msg in messages:
             caption = (CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, 
                                              filename=msg.document.file_name) if bool(CUSTOM_CAPTION) and bool(msg.document)
@@ -129,17 +130,15 @@ async def start_command(client: Client, message: Message):
     else:
         reply_markup = InlineKeyboardMarkup(
             [
-                    [InlineKeyboardButton("• ᴍᴏʀᴇ ᴄʜᴀɴɴᴇʟs •", url="https://t.me/mythic_animes/")],
-
-    [
-                    InlineKeyboardButton("• ᴀʙᴏᴜᴛ", callback_data = "about"),
-                    InlineKeyboardButton('ʜᴇʟᴘ •', callback_data = "help")
-
-    ]
+                [InlineKeyboardButton("• ᴍᴏʀᴇ ᴄʜᴀɴɴᴇʟs •", url="https://t.me/mythic_animes/")],
+                [
+                    InlineKeyboardButton("• ᴀʙᴏᴜᴛ", callback_data="about"),
+                    InlineKeyboardButton('ʜᴇʟᴘ •', callback_data="help")
+                ]
             ]
         )
+        # Show "typing" chat action before sending start message
         await message.reply_chat_action(ChatAction.TYPING)
-
         await message.reply_photo(
             photo=START_PIC,
             caption=START_MSG.format(
@@ -150,8 +149,8 @@ async def start_command(client: Client, message: Message):
                 id=message.from_user.id
             ),
             reply_markup=reply_markup,
-            message_effect_id=5104841245755180586)  # 🔥
-
+            message_effect_id=5104841245755180586
+        )  # 🔥
         return
 
 
